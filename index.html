@@ -1,0 +1,1490 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      :root {
+        --bg: #faf9f6;
+        --surface: #ffffff;
+        --surface2: #f5f4f0;
+        --border: #e8e5de;
+        --border2: #d4d0c8;
+        --text: #1a1917;
+        --text2: #6b6760;
+        --text3: #a09d98;
+        --accent: #c17f3a;
+        --accent2: #e8a84a;
+        --accent-bg: #fdf6ec;
+        --teal: #2d7d62;
+        --teal-bg: #edf7f3;
+        --red: #c13a3a;
+        --red-bg: #fdf0f0;
+        --radius: 10px;
+        --radius-lg: 16px;
+      }
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        font-size: 15px;
+        min-height: 100vh;
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: "DM Serif Display", serif;
+        font-weight: 400;
+      }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      /* Layout */
+      .app {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+      .header {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .header-logo {
+        width: 36px;
+        height: 36px;
+        background: var(--accent);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .header-logo svg {
+        width: 20px;
+        height: 20px;
+        fill: white;
+      }
+      .header h1 {
+        font-size: 18px;
+        color: var(--text);
+      }
+      .header-nav {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+      }
+      .nav-btn {
+        padding: 8px 16px;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        background: transparent;
+        cursor: pointer;
+        font-family: "DM Sans", sans-serif;
+        font-size: 13px;
+        color: var(--text2);
+        transition: all 0.15s;
+      }
+      .nav-btn:hover {
+        background: var(--surface2);
+        color: var(--text);
+      }
+      .nav-btn.active {
+        background: var(--accent);
+        color: white;
+        border-color: var(--accent);
+      }
+
+      .main {
+        flex: 1;
+        padding: 24px;
+        max-width: 860px;
+        margin: 0 auto;
+        width: 100%;
+      }
+
+      /* Home page */
+      .page-title {
+        font-size: 32px;
+        margin-bottom: 6px;
+        color: var(--text);
+      }
+      .page-sub {
+        color: var(--text2);
+        font-size: 14px;
+        margin-bottom: 28px;
+      }
+      .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+      }
+      .service-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 22px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .service-card:hover {
+        border-color: var(--accent);
+        box-shadow: 0 4px 20px rgba(193, 127, 58, 0.12);
+        transform: translateY(-1px);
+      }
+      .service-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        background: var(--accent-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+      }
+      .service-card h3 {
+        font-family: "DM Serif Display", serif;
+        font-size: 17px;
+        font-weight: 400;
+        color: var(--text);
+      }
+      .service-card p {
+        font-size: 13px;
+        color: var(--text2);
+        line-height: 1.5;
+      }
+      .service-arrow {
+        color: var(--accent);
+        font-size: 18px;
+        margin-top: auto;
+        align-self: flex-end;
+      }
+
+      /* Form page */
+      .form-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+      .back-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: transparent;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text2);
+        font-size: 18px;
+        transition: all 0.15s;
+      }
+      .back-btn:hover {
+        background: var(--surface2);
+        color: var(--text);
+      }
+      .form-title {
+        font-size: 26px;
+        color: var(--text);
+      }
+      .form-badge {
+        font-size: 12px;
+        background: var(--accent-bg);
+        color: var(--accent);
+        padding: 4px 10px;
+        border-radius: 20px;
+        border: 1px solid rgba(193, 127, 58, 0.2);
+      }
+
+      .form-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        margin-bottom: 16px;
+      }
+      .form-section-title {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 16px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 14px;
+      }
+      .form-row.three {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+      .form-row.single {
+        grid-template-columns: 1fr;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .form-group label {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text2);
+      }
+      .form-group input,
+      .form-group select {
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--bg);
+        font-family: "DM Sans", sans-serif;
+        font-size: 14px;
+        color: var(--text);
+        outline: none;
+        transition: border 0.15s;
+        width: 100%;
+      }
+      .form-group input:focus,
+      .form-group select:focus {
+        border-color: var(--accent);
+      }
+      .form-group input[readonly] {
+        background: var(--surface2);
+        color: var(--text2);
+        cursor: default;
+      }
+      .calc-result {
+        padding: 10px 12px;
+        border: 1px dashed var(--border2);
+        border-radius: var(--radius);
+        background: var(--accent-bg);
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--accent);
+      }
+
+      /* Item rows for reupholstery */
+      .item-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1.2fr;
+        gap: 10px;
+        align-items: end;
+        margin-bottom: 10px;
+      }
+      .item-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+        padding: 10px 0 10px 0;
+      }
+
+      /* Summary / totals */
+      .totals-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        margin-bottom: 16px;
+      }
+      .total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+        color: var(--text2);
+      }
+      .total-row:last-child {
+        border: none;
+      }
+      .total-row.grand {
+        font-size: 18px;
+        font-family: "DM Serif Display", serif;
+        color: var(--text);
+        padding-top: 14px;
+        margin-top: 4px;
+        border-top: 2px solid var(--border);
+      }
+      .total-row span:last-child {
+        font-weight: 500;
+        color: var(--text);
+      }
+      .total-row.grand span:last-child {
+        color: var(--accent);
+        font-size: 20px;
+      }
+
+      /* Action buttons */
+      .actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+      }
+      .btn {
+        padding: 11px 22px;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        cursor: pointer;
+        font-family: "DM Sans", sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: white;
+        border-color: var(--accent);
+      }
+      .btn-primary:hover {
+        background: #b07234;
+      }
+      .btn-secondary {
+        background: var(--surface);
+        color: var(--text2);
+      }
+      .btn-secondary:hover {
+        background: var(--surface2);
+        color: var(--text);
+      }
+      .btn-success {
+        background: var(--teal);
+        color: white;
+        border-color: var(--teal);
+      }
+      .btn-success:hover {
+        background: #256950;
+      }
+      .btn-outline {
+        background: transparent;
+        color: var(--text2);
+      }
+      .btn-outline:hover {
+        background: var(--surface2);
+      }
+
+      /* Quotations list */
+      .quote-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .quote-item {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 18px 20px;
+        cursor: pointer;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .quote-item:hover {
+        border-color: var(--accent);
+        background: var(--accent-bg);
+      }
+      .quote-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: var(--accent-bg);
+        border: 1px solid rgba(193, 127, 58, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "DM Serif Display", serif;
+        font-size: 16px;
+        color: var(--accent);
+        flex-shrink: 0;
+      }
+      .quote-info {
+        flex: 1;
+      }
+      .quote-name {
+        font-weight: 500;
+        font-size: 15px;
+        margin-bottom: 2px;
+      }
+      .quote-meta {
+        font-size: 12px;
+        color: var(--text3);
+      }
+      .quote-total {
+        font-family: "DM Serif Display", serif;
+        font-size: 18px;
+        color: var(--accent);
+        text-align: right;
+      }
+      .quote-badge {
+        font-size: 11px;
+        padding: 3px 8px;
+        border-radius: 20px;
+        background: var(--surface2);
+        color: var(--text2);
+        display: inline-block;
+        margin-top: 3px;
+      }
+
+      /* Search bar */
+      .search-bar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      .search-bar input {
+        flex: 1;
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface);
+        font-family: "DM Sans", sans-serif;
+        font-size: 14px;
+        outline: none;
+        transition: border 0.15s;
+      }
+      .search-bar input:focus {
+        border-color: var(--accent);
+      }
+
+      /* Customer section */
+      .customer-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 0;
+      }
+
+      /* Tabs for bed/cover */
+      .tab-group {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 18px;
+      }
+      .tab {
+        padding: 8px 16px;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text2);
+        transition: all 0.15s;
+        background: transparent;
+        font-family: "DM Sans", sans-serif;
+      }
+      .tab.active {
+        background: var(--accent);
+        color: white;
+        border-color: var(--accent);
+      }
+
+      /* Quotation view */
+      .quote-view-header {
+        text-align: center;
+        padding: 20px 0 24px;
+        border-bottom: 2px solid var(--border);
+        margin-bottom: 24px;
+      }
+      .quote-view-header .logo-text {
+        font-family: "DM Serif Display", serif;
+        font-size: 24px;
+        color: var(--accent);
+        margin-bottom: 4px;
+      }
+      .quote-view-header .sub {
+        font-size: 12px;
+        color: var(--text3);
+      }
+      .quote-meta-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 20px;
+      }
+      .meta-item {
+        font-size: 13px;
+      }
+      .meta-item .label {
+        color: var(--text3);
+        margin-bottom: 2px;
+      }
+      .meta-item .value {
+        font-weight: 500;
+        color: var(--text);
+      }
+      .breakdown-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 16px;
+        font-size: 13px;
+      }
+      .breakdown-table th {
+        text-align: left;
+        padding: 8px 10px;
+        background: var(--surface2);
+        color: var(--text3);
+        font-weight: 500;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .breakdown-table td {
+        padding: 9px 10px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text);
+      }
+      .breakdown-table td:last-child {
+        text-align: right;
+        font-weight: 500;
+      }
+      .breakdown-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* Toast */
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: var(--text);
+        color: #fff;
+        padding: 12px 18px;
+        border-radius: var(--radius);
+        font-size: 13px;
+        z-index: 999;
+        opacity: 0;
+        transform: translateY(8px);
+        transition: all 0.2s;
+        pointer-events: none;
+      }
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Utility */
+      .text-center {
+        text-align: center;
+      }
+      .mt16 {
+        margin-top: 16px;
+      }
+      .empty-state {
+        text-align: center;
+        padding: 48px 24px;
+        color: var(--text3);
+      }
+      .empty-state .icon {
+        font-size: 40px;
+        margin-bottom: 12px;
+      }
+      .empty-state p {
+        font-size: 14px;
+      }
+      @media (max-width: 600px) {
+        .form-row,
+        .form-row.three,
+        .customer-grid,
+        .item-row,
+        .quote-meta-grid {
+          grid-template-columns: 1fr;
+        }
+        .main {
+          padding: 16px;
+        }
+        .header {
+          padding: 12px 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h2 class="sr-only">
+      Sofa Quotation Automation System — create and manage quotations for sofa
+      making, upholstery, reupholstery, bed making, and sofa covers.
+    </h2>
+    <div class="app" id="app"></div>
+    <div class="toast" id="toast"></div>
+    <script>
+      const { jsPDF } = window.jspdf || {};
+
+      // ─── State ───────────────────────────────────────────────────────────────────
+      let state = {
+        page: "home", // home | form | summary | quotes | view
+        selectedService: null,
+        customerName: "",
+        customerPhone: "",
+        quotationDate: new Date().toISOString().split("T")[0],
+        formData: {},
+        commission: 5,
+        gst: 18,
+        discount: 0,
+        quotations: JSON.parse(localStorage.getItem("sofa_quotations") || "[]"),
+        viewQuote: null,
+        coverType: "simple",
+        bedType: "bed",
+      };
+
+      // ─── Services ─────────────────────────────────────────────────────────────────
+      const SERVICES = [
+        {
+          id: "structure",
+          label: "Sofa Making",
+          sub: "Structure fabrication from scratch",
+          icon: "🪑",
+          desc: "Build custom sofa frames with specific measurements and material rates.",
+        },
+        {
+          id: "upholstery",
+          label: "Sofa Upholstery",
+          sub: "New fabric & foam fitting",
+          icon: "🧵",
+          desc: "Apply new upholstery, foam, and fabric to a new sofa frame.",
+        },
+        {
+          id: "reupholstery",
+          label: "Reupholstery",
+          sub: "Restore old sofas",
+          icon: "♻️",
+          desc: "Full refurbishment of old sofas with new materials listed individually.",
+        },
+        {
+          id: "bed",
+          label: "Bed Making",
+          sub: "Beds & headboards",
+          icon: "🛏️",
+          desc: "Custom bed and bed-back sizing for carpentry and upholstery work.",
+        },
+        {
+          id: "cover",
+          label: "Sofa Cover",
+          sub: "Simple or sponge covers",
+          icon: "🪢",
+          desc: "Protective or decorative covers with or without sponge lining.",
+        },
+      ];
+
+      const REUPHOLSTERY_ITEMS = [
+        { key: "sponge4", label: "4 inch Sponge", unit: "feet" },
+        { key: "sponge2", label: "2 inch Sponge", unit: "feet" },
+        { key: "sponge1", label: "1 inch Sponge", unit: "feet" },
+        { key: "stanzo", label: "Stanzo", unit: "meter" },
+        { key: "fevicol", label: "Fevicol", unit: "liter" },
+        { key: "madarpate", label: "Madarpate", unit: "meter" },
+        { key: "kapad", label: "Kapad", unit: "meter" },
+        { key: "recron", label: "Recron", unit: "meter" },
+        { key: "stapler", label: "Stapler Pin Box", unit: "qty" },
+      ];
+
+      // ─── Calculations ─────────────────────────────────────────────────────────────
+      function calcSubtotal() {
+        const fd = state.formData;
+        const s = state.selectedService;
+        if (s === "structure" || s === "upholstery")
+          return (parseFloat(fd.feet) || 0) * (parseFloat(fd.rate) || 0);
+        if (s === "reupholstery") {
+          return REUPHOLSTERY_ITEMS.reduce((sum, item) => {
+            const rate = parseFloat(fd[item.key + "_rate"]) || 0;
+            const qty = parseFloat(fd[item.key + "_qty"]) || 0;
+            return sum + rate * qty;
+          }, 0);
+        }
+        if (s === "bed") return 0;
+        if (s === "cover") {
+          if (state.coverType === "simple") {
+            const kapad =
+              (parseFloat(fd.kapad_rate) || 0) *
+              (parseFloat(fd.kapad_meter) || 0);
+            const labour = parseFloat(fd.labour) || 0;
+            return kapad + labour;
+          } else {
+            const kapad =
+              (parseFloat(fd.kapad_rate) || 0) *
+              (parseFloat(fd.kapad_meter) || 0);
+            const stanzo =
+              (parseFloat(fd.stanzo_rate) || 0) *
+              (parseFloat(fd.stanzo_meter) || 0);
+            const labour = parseFloat(fd.labour) || 0;
+            return kapad + stanzo + labour;
+          }
+        }
+        return 0;
+      }
+
+      function calcBreakdown() {
+        const fd = state.formData;
+        const s = state.selectedService;
+        const items = [];
+        if (s === "structure" || s === "upholstery") {
+          const feet = parseFloat(fd.feet) || 0,
+            rate = parseFloat(fd.rate) || 0;
+          items.push({
+            label: "Size",
+            value: feet + " ft × ₹" + rate + "/ft",
+            amount: feet * rate,
+          });
+        }
+        if (s === "reupholstery") {
+          REUPHOLSTERY_ITEMS.forEach((item) => {
+            const rate = parseFloat(fd[item.key + "_rate"]) || 0;
+            const qty = parseFloat(fd[item.key + "_qty"]) || 0;
+            if (rate || qty)
+              items.push({
+                label: item.label,
+                value: qty + " " + item.unit + " × ₹" + rate,
+                amount: rate * qty,
+              });
+          });
+        }
+        if (s === "cover") {
+          const km = parseFloat(fd.kapad_meter) || 0,
+            kr = parseFloat(fd.kapad_rate) || 0;
+          if (km || kr)
+            items.push({
+              label: "Kapad",
+              value: km + " m × ₹" + kr,
+              amount: km * kr,
+            });
+          if (state.coverType === "sponge") {
+            const sm = parseFloat(fd.stanzo_meter) || 0,
+              sr = parseFloat(fd.stanzo_rate) || 0;
+            if (sm || sr)
+              items.push({
+                label: "Stanzo",
+                value: sm + " m × ₹" + sr,
+                amount: sm * sr,
+              });
+          }
+          const lab = parseFloat(fd.labour) || 0;
+          if (lab) items.push({ label: "Labour", value: "—", amount: lab });
+        }
+        if (s === "bed") {
+          const h = fd.height || "—",
+            w = fd.width || "—",
+            t = state.bedType;
+          items.push({
+            label: t === "bed" ? "Bed" : "Bed Back",
+            value: "H: " + h + " × W: " + w,
+            amount: null,
+          });
+        }
+        return items;
+      }
+
+      function calcTotals() {
+        const sub = calcSubtotal();
+        const commission = (sub * (parseFloat(state.commission) || 0)) / 100;
+        const afterComm = sub + commission;
+        const disc = parseFloat(state.discount) || 0;
+        const afterDisc = Math.max(0, afterComm - disc);
+        const gstAmt = (afterDisc * (parseFloat(state.gst) || 0)) / 100;
+        const grand = afterDisc + gstAmt;
+        return { sub, commission, afterComm, disc, afterDisc, gstAmt, grand };
+      }
+
+      // ─── Persistence ──────────────────────────────────────────────────────────────
+      function saveToLocalStorage() {
+        localStorage.setItem(
+          "sofa_quotations",
+          JSON.stringify(state.quotations),
+        );
+      }
+
+      function saveQuotation() {
+        const totals = calcTotals();
+        const q = {
+          id: Date.now().toString(),
+          customerName: state.customerName || "Unknown",
+          customerPhone: state.customerPhone || "",
+          date: state.quotationDate,
+          serviceType: state.selectedService,
+          serviceLabel: SERVICES.find((s) => s.id === state.selectedService)
+            ?.label,
+          formData: { ...state.formData },
+          coverType: state.coverType,
+          bedType: state.bedType,
+          commission: state.commission,
+          gst: state.gst,
+          discount: state.discount,
+          breakdown: calcBreakdown(),
+          totals,
+        };
+        state.quotations.unshift(q);
+        saveToLocalStorage();
+        showToast("Quotation saved successfully!");
+      }
+
+      // ─── Toast ────────────────────────────────────────────────────────────────────
+      function showToast(msg) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 2800);
+      }
+
+      // ─── PDF Export ───────────────────────────────────────────────────────────────
+      function exportPDF(quote) {
+        if (!jsPDF) {
+          showToast("PDF library loading, please try again.");
+          return;
+        }
+        const doc = new jsPDF();
+        const t = quote.totals;
+        let y = 20;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(20);
+        doc.setTextColor(193, 127, 58);
+        doc.text("SOFA CRAFT", 105, y, { align: "center" });
+        y += 7;
+        doc.setFontSize(10);
+        doc.setTextColor(160, 157, 152);
+        doc.setFont("helvetica", "normal");
+        doc.text("Quotation System", 105, y, { align: "center" });
+        y += 10;
+        doc.setDrawColor(232, 229, 222);
+        doc.line(15, y, 195, y);
+        y += 8;
+        doc.setFontSize(13);
+        doc.setTextColor(26, 25, 23);
+        doc.setFont("helvetica", "bold");
+        doc.text("QUOTATION", 15, y);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(107, 103, 96);
+        doc.text("Date: " + quote.date, 195, y, { align: "right" });
+        y += 7;
+        doc.setFontSize(10);
+        doc.text("Customer: " + quote.customerName, 15, y);
+        if (quote.customerPhone)
+          doc.text("Phone: " + quote.customerPhone, 195, y, { align: "right" });
+        y += 5;
+        doc.text(
+          "Service: " + (quote.serviceLabel || quote.serviceType),
+          15,
+          y,
+        );
+        y += 10;
+        doc.line(15, y, 195, y);
+        y += 8;
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(26, 25, 23);
+        doc.text("Item", 15, y);
+        doc.text("Details", 80, y);
+        doc.text("Amount", 180, y, { align: "right" });
+        y += 6;
+        doc.setDrawColor(220, 216, 200);
+        doc.line(15, y, 195, y);
+        y += 6;
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(60, 55, 50);
+        (quote.breakdown || []).forEach((item) => {
+          doc.text(item.label, 15, y);
+          doc.text(item.value || "", 80, y);
+          doc.text(item.amount != null ? "₹" + fmt(item.amount) : "—", 180, y, {
+            align: "right",
+          });
+          y += 7;
+        });
+        y += 4;
+        doc.line(15, y, 195, y);
+        y += 8;
+        const rows = [
+          ["Subtotal", "₹" + fmt(t.sub)],
+          ["Commission (" + quote.commission + "%)", "₹" + fmt(t.commission)],
+          ["Discount", "- ₹" + fmt(t.disc)],
+          ["GST (" + quote.gst + "%)", "₹" + fmt(t.gstAmt)],
+        ];
+        rows.forEach(([l, v]) => {
+          doc.setFontSize(10);
+          doc.setTextColor(107, 103, 96);
+          doc.text(l, 120, y);
+          doc.text(v, 195, y, { align: "right" });
+          y += 7;
+        });
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(13);
+        doc.setTextColor(193, 127, 58);
+        doc.text("GRAND TOTAL", 120, y);
+        doc.text("₹" + fmt(t.grand), 195, y, { align: "right" });
+        y += 14;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        doc.setTextColor(160, 157, 152);
+        doc.text("This is a computer-generated quotation.", 105, y, {
+          align: "center",
+        });
+        doc.save(
+          "quotation_" +
+            quote.customerName.replace(/\s/g, "_") +
+            "_" +
+            quote.id +
+            ".pdf",
+        );
+        showToast("PDF downloaded!");
+      }
+
+      function fmt(n) {
+        return (Math.round((n || 0) * 100) / 100).toLocaleString("en-IN", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      }
+
+      // ─── Render ───────────────────────────────────────────────────────────────────
+      function render() {
+        const app = document.getElementById("app");
+        app.innerHTML =
+          renderHeader() + '<div class="main">' + renderPage() + "</div>";
+        bindEvents();
+      }
+
+      function renderHeader() {
+        const navItems = [
+          { id: "home", label: "New Quote" },
+          { id: "quotes", label: "All Quotations" },
+        ];
+        return `<header class="header">
+    <div class="header-logo"><svg viewBox="0 0 24 24"><path d="M2 9a2 2 0 012-2h2V5a1 1 0 011-1h10a1 1 0 011 1v2h2a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V9zm4 0H4v7h16V9h-2v1a1 1 0 01-1 1H7a1 1 0 01-1-1V9zm2-4v4h8V5H8z"/></svg></div>
+    <h1>Sofa Craft</h1>
+    <nav class="header-nav">
+      ${navItems.map((n) => `<button class="nav-btn${state.page === n.id || ((state.page === "form" || state.page === "summary") && n.id === "home") ? " active" : ""}" onclick="navigate('${n.id}')">${n.label}</button>`).join("")}
+    </nav>
+  </header>`;
+      }
+
+      function navigate(page) {
+        if (page === "home") {
+          state.page = "home";
+          state.selectedService = null;
+          state.formData = {};
+          state.customerName = "";
+          state.customerPhone = "";
+          state.discount = 0;
+        } else state.page = page;
+        render();
+      }
+
+      function renderPage() {
+        if (state.page === "home") return renderHome();
+        if (state.page === "form") return renderForm();
+        if (state.page === "summary") return renderSummary();
+        if (state.page === "quotes") return renderQuotes();
+        if (state.page === "view") return renderView();
+        return "";
+      }
+
+      // ─── HOME ─────────────────────────────────────────────────────────────────────
+      function renderHome() {
+        return `<h2 class="page-title">New Quotation</h2>
+  <p class="page-sub">Select a service to begin creating a quotation</p>
+  <div class="services-grid">
+    ${SERVICES.map(
+      (s) => `
+    <div class="service-card" onclick="selectService('${s.id}')">
+      <div class="service-icon">${s.icon}</div>
+      <h3>${s.label}</h3>
+      <p>${s.desc}</p>
+      <div class="service-arrow">→</div>
+    </div>`,
+    ).join("")}
+  </div>`;
+      }
+
+      function selectService(id) {
+        state.selectedService = id;
+        state.formData = {};
+        state.page = "form";
+        render();
+      }
+
+      // ─── FORM ─────────────────────────────────────────────────────────────────────
+      function renderForm() {
+        const svc = SERVICES.find((s) => s.id === state.selectedService);
+        return `
+  <div class="form-header">
+    <button class="back-btn" onclick="navigate('home')">←</button>
+    <div>
+      <h2 class="form-title">${svc.label}</h2>
+    </div>
+    <span class="form-badge" style="margin-left:8px">${svc.icon} ${svc.sub}</span>
+  </div>
+  ${renderCustomerSection()}
+  ${renderServiceForm()}
+  ${renderGlobalFields()}
+  ${renderLiveTotal()}
+  <div class="actions">
+    <button class="btn btn-primary" onclick="goToSummary()">Preview Quotation →</button>
+    <button class="btn btn-secondary" onclick="navigate('home')">Cancel</button>
+  </div>`;
+      }
+
+      function renderCustomerSection() {
+        return `<div class="form-card">
+    <div class="form-section-title">Customer Details</div>
+    <div class="customer-grid">
+      <div class="form-group">
+        <label>Customer Name</label>
+        <input type="text" id="customerName" value="${esc(state.customerName)}" placeholder="Enter name" oninput="updateState('customerName',this.value)">
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="text" id="customerPhone" value="${esc(state.customerPhone)}" placeholder="Phone number" oninput="updateState('customerPhone',this.value)">
+      </div>
+      <div class="form-group">
+        <label>Quotation Date</label>
+        <input type="date" id="quotationDate" value="${state.quotationDate}" oninput="updateState('quotationDate',this.value)">
+      </div>
+    </div>
+  </div>`;
+      }
+
+      function renderServiceForm() {
+        const s = state.selectedService;
+        const fd = state.formData;
+        if (s === "structure" || s === "upholstery") {
+          const total = (parseFloat(fd.feet) || 0) * (parseFloat(fd.rate) || 0);
+          return `<div class="form-card">
+      <div class="form-section-title">Measurements & Rate</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Sofa Size (feet)</label>
+          <input type="number" min="0" step="0.5" value="${fd.feet || ""}" placeholder="e.g. 7" oninput="updateFD('feet',this.value)">
+        </div>
+        <div class="form-group">
+          <label>Rate per Foot (₹)</label>
+          <input type="number" min="0" value="${fd.rate || ""}" placeholder="e.g. 2500" oninput="updateFD('rate',this.value)">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Calculated Total</label>
+          <div class="calc-result">₹ ${fmt(total)}</div>
+        </div>
+      </div>
+    </div>`;
+        }
+        if (s === "reupholstery") {
+          return `<div class="form-card">
+      <div class="form-section-title">Materials & Costs</div>
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr;gap:10px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Item</div>
+        <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Rate (₹)</div>
+        <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Qty/Unit</div>
+        <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Amount</div>
+      </div>
+      ${REUPHOLSTERY_ITEMS.map((item) => {
+        const rate = parseFloat(fd[item.key + "_rate"]) || 0;
+        const qty = parseFloat(fd[item.key + "_qty"]) || 0;
+        const amt = rate * qty;
+        return `<div class="item-row">
+          <div class="item-label">${item.label}<br><small style="color:var(--text3);font-size:11px">per ${item.unit}</small></div>
+          <div class="form-group" style="margin:0">
+            <input type="number" min="0" value="${fd[item.key + "_rate"] || ""}" placeholder="0" oninput="updateFD('${item.key}_rate',this.value)" style="padding:9px 10px">
+          </div>
+          <div class="form-group" style="margin:0">
+            <input type="number" min="0" step="0.1" value="${fd[item.key + "_qty"] || ""}" placeholder="0" oninput="updateFD('${item.key}_qty',this.value)" style="padding:9px 10px">
+          </div>
+          <div class="calc-result" style="padding:9px 10px;font-size:13px">₹${fmt(amt)}</div>
+        </div>`;
+      }).join("")}
+    </div>`;
+        }
+        if (s === "bed") {
+          return `<div class="form-card">
+      <div class="form-section-title">Bed Type & Dimensions</div>
+      <div class="tab-group">
+        <button class="tab${state.bedType === "bed" ? " active" : ""}" onclick="setBedType('bed')">Bed</button>
+        <button class="tab${state.bedType === "bedback" ? " active" : ""}" onclick="setBedType('bedback')">Bed Back</button>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Height</label>
+          <input type="text" value="${fd.height || ""}" placeholder="e.g. 36 inches" oninput="updateFD('height',this.value)">
+        </div>
+        <div class="form-group">
+          <label>Width</label>
+          <input type="text" value="${fd.width || ""}" placeholder="e.g. 60 inches" oninput="updateFD('width',this.value)">
+        </div>
+      </div>
+      <div style="padding:12px;background:var(--teal-bg);border-radius:var(--radius);border:1px solid rgba(45,125,98,.15);font-size:13px;color:var(--teal);margin-top:4px">
+        Dimensions recorded. No cost calculation for bed making — dimensions only.
+      </div>
+    </div>`;
+        }
+        if (s === "cover") {
+          const coverType = state.coverType;
+          const kapadAmt =
+            (parseFloat(fd.kapad_rate) || 0) *
+            (parseFloat(fd.kapad_meter) || 0);
+          const stanzoAmt =
+            (parseFloat(fd.stanzo_rate) || 0) *
+            (parseFloat(fd.stanzo_meter) || 0);
+          const labour = parseFloat(fd.labour) || 0;
+          const total =
+            kapadAmt + (coverType === "sponge" ? stanzoAmt : 0) + labour;
+          return `<div class="form-card">
+      <div class="form-section-title">Cover Type</div>
+      <div class="tab-group">
+        <button class="tab${coverType === "simple" ? " active" : ""}" onclick="setCoverType('simple')">Simple Cover</button>
+        <button class="tab${coverType === "sponge" ? " active" : ""}" onclick="setCoverType('sponge')">Sponge Cover</button>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Kapad Rate (₹/meter)</label>
+          <input type="number" min="0" value="${fd.kapad_rate || ""}" placeholder="0" oninput="updateFD('kapad_rate',this.value)">
+        </div>
+        <div class="form-group">
+          <label>Kapad Meter</label>
+          <input type="number" min="0" step="0.1" value="${fd.kapad_meter || ""}" placeholder="0" oninput="updateFD('kapad_meter',this.value)">
+        </div>
+      </div>
+      ${
+        coverType === "sponge"
+          ? `<div class="form-row">
+        <div class="form-group">
+          <label>Stanzo Rate (₹/meter)</label>
+          <input type="number" min="0" value="${fd.stanzo_rate || ""}" placeholder="0" oninput="updateFD('stanzo_rate',this.value)">
+        </div>
+        <div class="form-group">
+          <label>Stanzo Meter</label>
+          <input type="number" min="0" step="0.1" value="${fd.stanzo_meter || ""}" placeholder="0" oninput="updateFD('stanzo_meter',this.value)">
+        </div>
+      </div>`
+          : ""
+      }
+      <div class="form-row">
+        <div class="form-group">
+          <label>Labour (₹)</label>
+          <input type="number" min="0" value="${fd.labour || ""}" placeholder="0" oninput="updateFD('labour',this.value)">
+        </div>
+        <div class="form-group">
+          <label>Calculated Total</label>
+          <div class="calc-result">₹ ${fmt(total)}</div>
+        </div>
+      </div>
+    </div>`;
+        }
+        return "";
+      }
+
+      function renderGlobalFields() {
+        return `<div class="form-card">
+    <div class="form-section-title">Adjustments</div>
+    <div class="form-row three">
+      <div class="form-group">
+        <label>Commission (%)</label>
+        <input type="number" min="0" max="100" step="0.5" value="${state.commission}" oninput="updateState('commission',this.value);renderLiveUpdate()">
+      </div>
+      <div class="form-group">
+        <label>GST (%)</label>
+        <input type="number" min="0" max="100" step="0.5" value="${state.gst}" oninput="updateState('gst',this.value);renderLiveUpdate()">
+      </div>
+      <div class="form-group">
+        <label>Discount (₹)</label>
+        <input type="number" min="0" value="${state.discount}" oninput="updateState('discount',this.value);renderLiveUpdate()">
+      </div>
+    </div>
+  </div>`;
+      }
+
+      function renderLiveTotal() {
+        const t = calcTotals();
+        return `<div class="totals-card" id="live-totals">
+    <div class="form-section-title">Live Total</div>
+    <div class="total-row"><span>Subtotal</span><span>₹ ${fmt(t.sub)}</span></div>
+    <div class="total-row"><span>Commission (${state.commission}%)</span><span>₹ ${fmt(t.commission)}</span></div>
+    <div class="total-row"><span>Discount</span><span>- ₹ ${fmt(t.disc)}</span></div>
+    <div class="total-row"><span>GST (${state.gst}%)</span><span>₹ ${fmt(t.gstAmt)}</span></div>
+    <div class="total-row grand"><span>Grand Total</span><span>₹ ${fmt(t.grand)}</span></div>
+  </div>`;
+      }
+
+      // ─── SUMMARY ──────────────────────────────────────────────────────────────────
+      function renderSummary() {
+        const svc = SERVICES.find((s) => s.id === state.selectedService);
+        const t = calcTotals();
+        const breakdown = calcBreakdown();
+        return `
+  <div class="form-header">
+    <button class="back-btn" onclick="navigate('form')">←</button>
+    <h2 class="form-title">Quotation Preview</h2>
+  </div>
+  <div class="form-card">
+    <div class="quote-view-header">
+      <div class="logo-text">Sofa Craft</div>
+      <div class="sub">Professional Quotation</div>
+    </div>
+    <div class="quote-meta-grid">
+      <div class="meta-item"><div class="label">Customer</div><div class="value">${esc(state.customerName) || "—"}</div></div>
+      <div class="meta-item"><div class="label">Phone</div><div class="value">${esc(state.customerPhone) || "—"}</div></div>
+      <div class="meta-item"><div class="label">Date</div><div class="value">${state.quotationDate}</div></div>
+      <div class="meta-item"><div class="label">Service</div><div class="value">${svc.icon} ${svc.label}</div></div>
+    </div>
+    <div class="form-section-title">Breakdown</div>
+    <table class="breakdown-table">
+      <thead><tr><th>Item</th><th>Details</th><th>Amount</th></tr></thead>
+      <tbody>
+        ${breakdown.length ? breakdown.map((item) => `<tr><td>${esc(item.label)}</td><td style="color:var(--text2)">${esc(item.value)}</td><td>${item.amount != null ? "₹" + fmt(item.amount) : "Dimensions only"}</td></tr>`).join("") : '<tr><td colspan="3" style="text-align:center;color:var(--text3);padding:16px">No items entered</td></tr>'}
+      </tbody>
+    </table>
+    <div class="form-section-title" style="margin-top:16px">Totals</div>
+    <div class="total-row"><span>Subtotal</span><span>₹ ${fmt(t.sub)}</span></div>
+    <div class="total-row"><span>Commission (${state.commission}%)</span><span>₹ ${fmt(t.commission)}</span></div>
+    <div class="total-row"><span>Discount</span><span>- ₹ ${fmt(t.disc)}</span></div>
+    <div class="total-row"><span>GST (${state.gst}%)</span><span>₹ ${fmt(t.gstAmt)}</span></div>
+    <div class="total-row grand"><span>Grand Total</span><span>₹ ${fmt(t.grand)}</span></div>
+  </div>
+  <div class="actions">
+    <button class="btn btn-primary" onclick="saveAndFinish()">Save Quotation</button>
+    <button class="btn btn-success" onclick="printPage()">🖨 Print</button>
+    <button class="btn btn-secondary" onclick="navigate('form')">← Edit</button>
+  </div>`;
+      }
+
+      function saveAndFinish() {
+        saveQuotation();
+        state.page = "quotes";
+        render();
+      }
+
+      function printPage() {
+        window.print();
+      }
+
+      // ─── QUOTES LIST ──────────────────────────────────────────────────────────────
+      let searchQuery = "";
+      function renderQuotes() {
+        const filtered = state.quotations.filter(
+          (q) =>
+            !searchQuery ||
+            q.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            q.serviceLabel?.toLowerCase().includes(searchQuery.toLowerCase()),
+        );
+        return `<h2 class="page-title">All Quotations</h2>
+  <p class="page-sub">${state.quotations.length} quotation${state.quotations.length !== 1 ? "s" : ""} saved</p>
+  <div class="search-bar">
+    <input type="text" placeholder="Search by customer or service..." value="${esc(searchQuery)}" oninput="searchQuery=this.value;renderQuotesList()">
+  </div>
+  <div class="quote-list" id="quote-list">${renderQuoteList(filtered)}</div>`;
+      }
+
+      function renderQuoteList(list) {
+        if (!list.length)
+          return `<div class="empty-state"><div class="icon">📋</div><p>${searchQuery ? "No results found." : "No quotations yet. Create your first one!"}</p></div>`;
+        return list
+          .map(
+            (q) => `
+    <div class="quote-item" onclick="viewQuote('${q.id}')">
+      <div class="quote-avatar">${(q.customerName || "?")[0].toUpperCase()}</div>
+      <div class="quote-info">
+        <div class="quote-name">${esc(q.customerName)}</div>
+        <div class="quote-meta">${q.date} · <span class="quote-badge">${q.serviceLabel || q.serviceType}</span></div>
+      </div>
+      <div style="text-align:right">
+        <div class="quote-total">₹${fmt(q.totals?.grand || 0)}</div>
+      </div>
+    </div>`,
+          )
+          .join("");
+      }
+
+      function renderQuotesList() {
+        const filtered = state.quotations.filter(
+          (q) =>
+            !searchQuery ||
+            q.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            q.serviceLabel?.toLowerCase().includes(searchQuery.toLowerCase()),
+        );
+        const el = document.getElementById("quote-list");
+        if (el) el.innerHTML = renderQuoteList(filtered);
+      }
+
+      function viewQuote(id) {
+        state.viewQuote = state.quotations.find((q) => q.id === id);
+        state.page = "view";
+        render();
+      }
+
+      // ─── VIEW QUOTE ───────────────────────────────────────────────────────────────
+      function renderView() {
+        const q = state.viewQuote;
+        if (!q) return "<p>Quotation not found.</p>";
+        const t = q.totals || {};
+        const svc = SERVICES.find((s) => s.id === q.serviceType);
+        return `
+  <div class="form-header">
+    <button class="back-btn" onclick="navigate('quotes')">←</button>
+    <h2 class="form-title">Quotation Details</h2>
+  </div>
+  <div class="form-card">
+    <div class="quote-view-header">
+      <div class="logo-text">Sofa Craft</div>
+      <div class="sub">Professional Quotation · #${q.id}</div>
+    </div>
+    <div class="quote-meta-grid">
+      <div class="meta-item"><div class="label">Customer</div><div class="value">${esc(q.customerName)}</div></div>
+      <div class="meta-item"><div class="label">Phone</div><div class="value">${esc(q.customerPhone) || "—"}</div></div>
+      <div class="meta-item"><div class="label">Date</div><div class="value">${q.date}</div></div>
+      <div class="meta-item"><div class="label">Service</div><div class="value">${svc ? svc.icon : ""} ${q.serviceLabel || q.serviceType}</div></div>
+    </div>
+    <div class="form-section-title">Breakdown</div>
+    <table class="breakdown-table">
+      <thead><tr><th>Item</th><th>Details</th><th>Amount</th></tr></thead>
+      <tbody>
+        ${(q.breakdown || []).length ? (q.breakdown || []).map((item) => `<tr><td>${esc(item.label)}</td><td style="color:var(--text2)">${esc(item.value)}</td><td>${item.amount != null ? "₹" + fmt(item.amount) : "—"}</td></tr>`).join("") : '<tr><td colspan="3" style="text-align:center;color:var(--text3)">No items</td></tr>'}
+      </tbody>
+    </table>
+    <div class="form-section-title" style="margin-top:16px">Totals</div>
+    <div class="total-row"><span>Subtotal</span><span>₹ ${fmt(t.sub)}</span></div>
+    <div class="total-row"><span>Commission (${q.commission}%)</span><span>₹ ${fmt(t.commission)}</span></div>
+    <div class="total-row"><span>Discount</span><span>- ₹ ${fmt(t.disc)}</span></div>
+    <div class="total-row"><span>GST (${q.gst}%)</span><span>₹ ${fmt(t.gstAmt)}</span></div>
+    <div class="total-row grand"><span>Grand Total</span><span>₹ ${fmt(t.grand)}</span></div>
+  </div>
+  <div class="actions">
+    <button class="btn btn-primary" onclick="exportPDF(state.viewQuote)">⬇ Download PDF</button>
+    <button class="btn btn-success" onclick="window.print()">🖨 Print</button>
+    <button class="btn btn-secondary" onclick="deleteQuote('${q.id}')">🗑 Delete</button>
+    <button class="btn btn-outline" onclick="navigate('quotes')">← Back</button>
+  </div>`;
+      }
+
+      function deleteQuote(id) {
+        state.quotations = state.quotations.filter((q) => q.id !== id);
+        saveToLocalStorage();
+        showToast("Quotation deleted.");
+        navigate("quotes");
+      }
+
+      // ─── Event Helpers ────────────────────────────────────────────────────────────
+      function updateFD(key, value) {
+        state.formData[key] = value;
+        updateLiveTotals();
+      }
+
+      function updateState(key, value) {
+        state[key] = value;
+      }
+
+      function setBedType(t) {
+        state.bedType = t;
+        render();
+      }
+
+      function setCoverType(t) {
+        state.coverType = t;
+        state.formData = {};
+        render();
+      }
+
+      function goToSummary() {
+        state.page = "summary";
+        render();
+      }
+
+      function updateLiveTotals() {
+        const el = document.getElementById("live-totals");
+        if (!el) return;
+        const t = calcTotals();
+        el.innerHTML = `<div class="form-section-title">Live Total</div>
+    <div class="total-row"><span>Subtotal</span><span>₹ ${fmt(t.sub)}</span></div>
+    <div class="total-row"><span>Commission (${state.commission}%)</span><span>₹ ${fmt(t.commission)}</span></div>
+    <div class="total-row"><span>Discount</span><span>- ₹ ${fmt(t.disc)}</span></div>
+    <div class="total-row"><span>GST (${state.gst}%)</span><span>₹ ${fmt(t.gstAmt)}</span></div>
+    <div class="total-row grand"><span>Grand Total</span><span>₹ ${fmt(t.grand)}</span></div>`;
+        // also update inline calc results
+        const fd = state.formData,
+          s = state.selectedService;
+        if (s === "structure" || s === "upholstery") {
+          const cr = document.querySelector(".calc-result");
+          if (cr)
+            cr.textContent =
+              "₹ " +
+              fmt((parseFloat(fd.feet) || 0) * (parseFloat(fd.rate) || 0));
+        }
+        if (s === "reupholstery") {
+          const results = document.querySelectorAll(".item-row .calc-result");
+          REUPHOLSTERY_ITEMS.forEach((item, i) => {
+            if (results[i])
+              results[i].textContent =
+                "₹" +
+                fmt(
+                  (parseFloat(fd[item.key + "_rate"]) || 0) *
+                    (parseFloat(fd[item.key + "_qty"]) || 0),
+                );
+          });
+        }
+        if (s === "cover") {
+          const cr = document.querySelector(".calc-result");
+          const kapadAmt =
+            (parseFloat(fd.kapad_rate) || 0) *
+            (parseFloat(fd.kapad_meter) || 0);
+          const stanzoAmt =
+            (parseFloat(fd.stanzo_rate) || 0) *
+            (parseFloat(fd.stanzo_meter) || 0);
+          const labour = parseFloat(fd.labour) || 0;
+          const total =
+            kapadAmt + (state.coverType === "sponge" ? stanzoAmt : 0) + labour;
+          if (cr) cr.textContent = "₹ " + fmt(total);
+        }
+      }
+
+      function renderLiveUpdate() {
+        updateLiveTotals();
+      }
+
+      function esc(str) {
+        if (!str) return "";
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function bindEvents() {}
+
+      // ─── Init ─────────────────────────────────────────────────────────────────────
+      render();
+    </script>
+  </body>
+</html>
