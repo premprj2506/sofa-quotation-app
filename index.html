@@ -356,7 +356,7 @@
         color: var(--text);
         padding-top: 14px;
         margin-top: 4px;
-        border-top: 2px solid var(--border);
+        /* border-top: 2px solid var(--border); */
       }
       .total-row span:last-child {
         font-weight: 500;
@@ -988,6 +988,13 @@
           desc: "10 વર્ષ અથવા 15 વર્ષની વોરંટી વિકલ્પ સાથે કસ્ટમ ગાદલા કિંમતો.",
           isMattress: true,
         },
+        {
+          id: "curtains",
+          label: "પડદા બનાવવા માટે",
+          sub: "Curtain Making",
+          icon: "🪟",
+          desc: "પડદાનું માપ દાખલ કરીને જરૂરી કાપડ, એસેસરીઝ અને કુલ ખર્ચની ગણતરી કરો.",
+        },
       ];
 
       // CHANGE 1: Added fevicol defaults to cover_sponge
@@ -1428,7 +1435,10 @@
         state.mattressThickness = null;
         state.mattressWarranty = null;
         if (id === "structure") state.formData = { ...DEFAULTS.structure };
-        else if (id === "upholstery")
+        else if (id === "curtains") {
+          window.location.href = "./curtains.html";
+          return;
+        } else if (id === "upholstery")
           state.formData = { ...DEFAULTS.upholstery };
         else if (id === "reupholstery")
           state.formData = { ...DEFAULTS.reupholstery };
@@ -1604,7 +1614,7 @@
         </div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Fevicol(ફેવિકોલ) દર (₹/લિટર) <span style="color:var(--text3);font-size:11px">default ₹350</span></label>
+        <div class="form-group"><label>Fevicol(ફેવિકોલ) દર (₹/લિટર)</label>
           <input type="number" min="0" value="${fd.fevicol_rate !== undefined ? fd.fevicol_rate : 350}" placeholder="350" oninput="updateFD('fevicol_rate',this.value)">
         </div>
         <div class="form-group"><label>Fevicol(ફેવિકોલ) લિટર</label>

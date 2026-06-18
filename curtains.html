@@ -1,0 +1,1054 @@
+<!doctype html>
+<html lang="gu">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>પડદા માટે - Curtain Estimation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Serif+Gujarati:wght@600;700&family=Noto+Sans+Gujarati:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #fbf6ef;
+        --surface: #ffffff;
+        --primary: #7a2e3b;
+        --primary-dark: #5c2129;
+        --accent: #c9a227;
+        --accent-soft: #f3e6bc;
+        --ink: #2b2118;
+        --muted: #8a7b6c;
+        --border: #e7dcc9;
+        --success: #3c7a5c;
+        --danger: #b23a3a;
+        --radius: 14px;
+        --shadow: 0 4px 16px rgba(43, 33, 24, 0.08);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Noto Sans Gujarati", "Noto Sans", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: "Noto Serif Gujarati", "Noto Sans Gujarati", serif;
+        margin: 0;
+      }
+      .app {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 18px 16px 60px;
+      }
+
+      /* ---------- Top bar ---------- */
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        background: var(--primary);
+        color: #fff;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        margin-bottom: 18px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .brand-icon {
+        font-size: 28px;
+      }
+      .brand h1 {
+        font-size: 20px;
+        line-height: 1.1;
+      }
+      .brand .tagline {
+        margin: 2px 0 0;
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        opacity: 0.8;
+        text-transform: uppercase;
+      }
+      .ghost-btn {
+        background: rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        color: #fff;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .ghost-btn:hover {
+        background: rgba(255, 255, 255, 0.24);
+      }
+
+      /* ---------- Screens ---------- */
+      .screen {
+        display: none;
+      }
+      .screen.active {
+        display: block;
+        animation: fadeIn 0.25s ease;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .section-title {
+        font-size: 19px;
+        margin: 6px 0 16px;
+        color: var(--primary-dark);
+      }
+
+      .back-btn {
+        background: none;
+        border: none;
+        color: var(--primary);
+        font-size: 14px;
+        padding: 0 0 14px;
+        cursor: pointer;
+        font-family: inherit;
+        font-weight: 600;
+      }
+
+      /* ---------- Type selection cards ---------- */
+      .type-grid {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      }
+      .type-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px 16px;
+        text-align: left;
+        cursor: pointer;
+        box-shadow: var(--shadow);
+        transition:
+          transform 0.15s ease,
+          border-color 0.15s ease;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        font-family: inherit;
+      }
+      .type-card:hover {
+        transform: translateY(-3px);
+        border-color: var(--accent);
+      }
+      .type-num {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--accent-soft);
+        color: var(--primary-dark);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+      }
+      .type-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--ink);
+      }
+      .type-sub {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      /* ---------- Cards ---------- */
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 18px;
+        margin-bottom: 14px;
+        box-shadow: var(--shadow);
+      }
+      .card h3 {
+        font-size: 15px;
+        color: var(--primary-dark);
+        margin-bottom: 12px;
+      }
+
+      .field-grid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      }
+      label {
+        font-size: 12.5px;
+        color: var(--muted);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-weight: 600;
+      }
+      input {
+        font-family: inherit;
+        font-size: 14.5px;
+        padding: 9px 11px;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        background: #fffdf9;
+        color: var(--ink);
+      }
+      input:focus {
+        outline: 2px solid var(--accent);
+        outline-offset: 1px;
+        border-color: var(--accent);
+      }
+
+      /* ---------- Breakdown ---------- */
+      .breakdown-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .breakdown-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13.5px;
+        border-bottom: 1px dashed var(--border);
+        padding-bottom: 7px;
+      }
+      .breakdown-row span:last-child {
+        font-weight: 600;
+      }
+      .total-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        font-size: 14px;
+      }
+      .total-row.subtotal {
+        border-top: 1px solid var(--border);
+        padding-top: 10px;
+        font-weight: 700;
+      }
+      .total-row.grand {
+        margin-top: 8px;
+        padding: 12px 14px;
+        background: var(--accent-soft);
+        border-radius: 10px;
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--primary-dark);
+      }
+
+      .action-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 6px;
+        flex-wrap: wrap;
+      }
+      .primary-btn,
+      .secondary-btn {
+        flex: 1;
+        min-width: 140px;
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-size: 14.5px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: inherit;
+        border: 1px solid transparent;
+      }
+      .primary-btn {
+        background: var(--primary);
+        color: #fff;
+      }
+      .primary-btn:hover {
+        background: var(--primary-dark);
+      }
+      .secondary-btn {
+        background: #fff;
+        color: var(--primary);
+        border-color: var(--primary);
+      }
+      .secondary-btn:hover {
+        background: var(--accent-soft);
+      }
+
+      /* ---------- Quotations list ---------- */
+      .quotations-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .quotation-item {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px;
+        box-shadow: var(--shadow);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .quotation-info b {
+        font-size: 14.5px;
+      }
+      .quotation-info .meta {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+      .quotation-total {
+        font-weight: 700;
+        color: var(--primary-dark);
+        font-size: 15px;
+      }
+      .qi-actions {
+        display: flex;
+        gap: 6px;
+      }
+      .qi-actions button {
+        border: 1px solid var(--border);
+        background: #fff;
+        padding: 7px 10px;
+        border-radius: 8px;
+        font-size: 12px;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .qi-actions button.danger {
+        color: var(--danger);
+        border-color: #e3bdbd;
+      }
+      .empty-note {
+        color: var(--muted);
+        font-size: 13.5px;
+        text-align: center;
+        padding: 30px 10px;
+      }
+
+      /* ---------- Print ---------- */
+      .print-only {
+        display: none;
+      }
+      @media print {
+        .topbar,
+        #screen-select,
+        #screen-form .back-btn,
+        .action-row,
+        #screen-list {
+          display: none !important;
+        }
+        body {
+          background: #fff;
+        }
+        .print-only {
+          display: block !important;
+        }
+        .app {
+          max-width: 100%;
+          padding: 0;
+        }
+      }
+      .print-doc {
+        padding: 20px;
+        font-family: "Noto Sans Gujarati", sans-serif;
+        color: #222;
+      }
+      .print-doc h2 {
+        font-size: 18px;
+        margin-bottom: 2px;
+      }
+      .print-doc .pd-sub {
+        color: #777;
+        font-size: 12px;
+        margin-bottom: 16px;
+      }
+      .print-doc table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 14px 0;
+        font-size: 13.5px;
+      }
+      .print-doc table td {
+        padding: 6px 4px;
+        border-bottom: 1px solid #eee;
+      }
+      .print-doc .pd-grand {
+        font-size: 16px;
+        font-weight: 700;
+        border-top: 2px solid #333;
+        padding-top: 8px;
+      }
+
+      @media (max-width: 520px) {
+        .field-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .action-row {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="topbar">
+        <div class="brand">
+          <span class="brand-icon">🪟</span>
+          <div>
+            <h1>પડદા માટે</h1>
+            <p class="tagline">Curtain Estimation</p>
+          </div>
+        </div>
+        <button class="ghost-btn" id="viewAllBtn">બધા કોટેશન</button>
+      </div>
+
+      <main id="mainArea">
+        <!-- Screen 1: type selection -->
+        <section class="screen active" id="screen-select">
+          <h2 class="section-title">તમારે કયા પડદા બનાવવા છે?</h2>
+          <div class="type-grid">
+            <button class="type-card" data-type="eyelet">
+              <span class="type-num">1</span>
+              <span class="type-name">આઇલેટ પડદા</span>
+              <span class="type-sub">Eyelet Curtains</span>
+            </button>
+            <button class="type-card" data-type="arabian">
+              <span class="type-num">2</span>
+              <span class="type-name">અરેબિયન પડદા</span>
+              <span class="type-sub">Arabian Curtains</span>
+            </button>
+            <button class="type-card" data-type="flatPleat">
+              <span class="type-num">3</span>
+              <span class="type-name">ચપટીવાળા અરેબિયન પડદા</span>
+              <span class="type-sub">Flat Pleat Arabian Curtains</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Screen 2: form -->
+        <section class="screen" id="screen-form">
+          <button class="back-btn" id="backBtn">← પાછા</button>
+          <h2 class="section-title" id="formTitle"></h2>
+
+          <div class="card">
+            <h3>ગ્રાહક વિગતો</h3>
+            <div class="field-grid">
+              <label
+                >નામ
+                <input id="custName" type="text" placeholder="ગ્રાહકનું નામ"
+              /></label>
+              <label
+                >ફોન નંબર
+                <input id="custPhone" type="tel" placeholder="મોબાઈલ નંબર"
+              /></label>
+              <label>તારીખ <input id="custDate" type="date" /></label>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>માપ (Measurements)</h3>
+            <div class="field-grid">
+              <label
+                >ઊંચાઈ (↕) ઇંચમાં
+                <input id="height" type="number" min="0" step="0.5" value="0"
+              /></label>
+              <label
+                >પહોળાઈ (↔) ઇંચમાં
+                <input id="width" type="number" min="0" step="0.5" value="0"
+              /></label>
+              <label
+                >Fullness
+                <input
+                  id="fullness"
+                  type="number"
+                  min="0"
+                  step="0.05"
+                  value="2"
+              /></label>
+            </div>
+          </div>
+
+          <div class="card" id="dynamicFieldsCard">
+            <h3>ખર્ચ વિગતો</h3>
+            <div class="field-grid" id="dynamicFields"></div>
+          </div>
+
+          <div class="card">
+            <h3>સમાયોજનો (Adjustments)</h3>
+            <div class="field-grid">
+              <label
+                >કમિશન %
+                <input
+                  id="commission"
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value="0"
+              /></label>
+              <label
+                >GST %
+                <input id="gst" type="number" min="0" step="0.5" value="0"
+              /></label>
+              <label
+                >ડિસ્કાઉન્ટ ₹
+                <input id="discount" type="number" min="0" step="10" value="0"
+              /></label>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>બ્રેકડાઉન (Breakdown)</h3>
+            <div class="breakdown-list" id="breakdownList"></div>
+            <div class="total-row subtotal">
+              <span>Subtotal</span><span id="subtotalVal">₹0</span>
+            </div>
+            <div class="total-row">
+              <span>+ કમિશન</span><span id="commissionVal">₹0</span>
+            </div>
+            <div class="total-row">
+              <span>+ GST</span><span id="gstVal">₹0</span>
+            </div>
+            <div class="total-row">
+              <span>− ડિસ્કાઉન્ટ</span><span id="discountVal">₹0</span>
+            </div>
+            <div class="total-row grand">
+              <span>કુલ રકમ</span><span id="grandTotalVal">₹0</span>
+            </div>
+          </div>
+
+          <div class="action-row">
+            <button class="primary-btn" id="saveBtn">સેવ કરો</button>
+            <button class="secondary-btn" id="printBtn">પ્રિન્ટ</button>
+          </div>
+        </section>
+
+        <!-- Screen 3: all quotations -->
+        <section class="screen" id="screen-list">
+          <button class="back-btn" id="backBtn2">← પાછા</button>
+          <h2 class="section-title">બધા(All) કોટેશન</h2>
+          <div class="quotations-list" id="quotationsList"></div>
+        </section>
+      </main>
+
+      <!-- Print template -->
+      <div class="print-only" id="printArea"></div>
+    </div>
+
+    <script>
+      (function () {
+        "use strict";
+
+        var STORAGE_KEY = "curtainQuotations";
+
+        var CONFIG = {
+          eyelet: {
+            name: "આઇલેટ પડદા",
+            fullness: 2,
+            fields: [
+              { key: "pipeRate", label: "પાઇપ નો દર (₹/ફૂટ)", def: 30 },
+              { key: "socketRate", label: "શોકેટ જોડી નો ભાવ (₹)", def: 150 },
+              { key: "socketQty", label: "શોકેટ જોડી સંખ્યા", def: 1 },
+              { key: "beltRate", label: "બેલ્ટ ની મજૂરી (₹/ફૂટ)", def: 40 },
+              { key: "panoWidth", label: "કાપડ નો પનો (ઇંચ)", def: 54 },
+              { key: "fabricRate", label: "કાપડનો દર (₹/મીટર)", def: 140 },
+              {
+                key: "sewingRate",
+                label: "સિલાઈ કરવાની મજૂરી (₹/ફૂટ)",
+                def: 20,
+              },
+              { key: "fittingCost", label: "પડદા લાગવાની મજૂરી (₹)", def: 200 },
+            ],
+            calc: function (v) {
+              var Wft = v.width / 12;
+              var pipeCost = Wft * v.pipeRate;
+              var socketCost = v.socketRate * v.socketQty;
+              var beltFeet = Wft * v.fullness;
+              var beltCost = beltFeet * v.beltRate;
+              var panels = Math.ceil((v.width * v.fullness) / v.panoWidth);
+              var meter = (panels * v.height) / 39.37;
+              var fabricCost = meter * v.fabricRate;
+              var sewingFeet = Wft * 1.5;
+              var sewingCost = sewingFeet * v.sewingRate;
+              var fittingCost = v.fittingCost;
+              return [
+                { label: "પાઇપ ખર્ચ", value: pipeCost },
+                { label: "શોકેટ ખર્ચ", value: socketCost },
+                { label: "બેલ્ટ મજૂરી", value: beltCost },
+                {
+                  label: "કાપડ ખર્ચ (" + meter.toFixed(2) + " મીટર)",
+                  value: fabricCost,
+                },
+                { label: "સિલાઈ મજૂરી", value: sewingCost },
+                { label: "પડદા લાગવાની મજૂરી", value: fittingCost },
+              ];
+            },
+          },
+          arabian: {
+            name: "અરેબિયન પડદા",
+            fullness: 2,
+            fields: [
+              { key: "channelRate", label: "ચેનલ નો દર (₹/ફૂટ)", def: 200 },
+              { key: "clampRate", label: "કલેમ્પ નો ભાવ (₹)", def: 50 },
+              { key: "clampQty", label: "કલેમ્પ સંખ્યા", def: 1 },
+              { key: "beltRate", label: "બેલ્ટ ની મજૂરી (₹/ફૂટ)", def: 65 },
+              { key: "panoWidth", label: "કાપડ નો પનો (ઇંચ)", def: 54 },
+              { key: "fabricRate", label: "કાપડનો દર (₹/મીટર)", def: 140 },
+              {
+                key: "sewingRate",
+                label: "સિલાઈ કરવાની મજૂરી (₹/ફૂટ)",
+                def: 20,
+              },
+              { key: "fittingCost", label: "પડદા લાગવાની મજૂરી (₹)", def: 200 },
+            ],
+            calc: function (v) {
+              var Wft = v.width / 12;
+              var channelCost = Wft * v.channelRate;
+              var clampCost = v.clampRate * v.clampQty;
+              var beltFeet = Wft * v.fullness;
+              var beltCost = beltFeet * v.beltRate;
+              var panels = Math.ceil((v.width * v.fullness) / v.panoWidth);
+              var meter = (panels * v.height) / 39.37;
+              var fabricCost = meter * v.fabricRate;
+              var sewingFeet = Wft * 1.5;
+              var sewingCost = sewingFeet * v.sewingRate;
+              var fittingCost = v.fittingCost;
+              return [
+                { label: "ચેનલ ખર્ચ", value: channelCost },
+                { label: "કલેમ્પ ખર્ચ", value: clampCost },
+                { label: "બેલ્ટ મજૂરી", value: beltCost },
+                {
+                  label: "કાપડ ખર્ચ (" + meter.toFixed(2) + " મીટર)",
+                  value: fabricCost,
+                },
+                { label: "સિલાઈ મજૂરી", value: sewingCost },
+                { label: "પડદા લાગવાની મજૂરી", value: fittingCost },
+              ];
+            },
+          },
+          flatPleat: {
+            name: "ચપટીવાળા અરેબિયન પડદા",
+            fullness: 2.25,
+            fields: [
+              {
+                key: "channelRate",
+                label: "હેવી ડ્યુટી ચેનલ નો દર (₹/ફૂટ)",
+                def: 220,
+              },
+              { key: "runnerRate", label: "રનર/કલેમ્પ નો ભાવ (₹)", def: 55 },
+              { key: "runnerQty", label: "રનર/કલેમ્પ સંખ્યા", def: 1 },
+              {
+                key: "beltRate",
+                label: "સ્પેશિયલ ફ્લેટ પ્લીટ બેલ્ટ મજૂરી (₹/ફૂટ)",
+                def: 75,
+              },
+              { key: "panoWidth", label: "કાપડ નો પનો (ઇંચ)", def: 54 },
+              { key: "fabricRate", label: "કાપડનો દર (₹/મીટર)", def: 140 },
+              {
+                key: "sewingRate",
+                label: "પ્રીમિયમ સિલાઈ મજૂરી (₹/ફૂટ)",
+                def: 25,
+              },
+              { key: "fittingCost", label: "ઇન્સ્ટોલેશન મજૂરી (₹)", def: 250 },
+            ],
+            calc: function (v) {
+              var Wft = v.width / 12;
+              var channelCost = Wft * v.channelRate;
+              var runnerCost = v.runnerRate * v.runnerQty;
+              var beltFeet = Wft * v.fullness;
+              var beltCost = beltFeet * v.beltRate;
+              var panels = Math.ceil((v.width * v.fullness) / v.panoWidth);
+              var meter = (panels * v.height) / 39.37;
+              var fabricCost = meter * v.fabricRate;
+              var sewingFeet = Wft * 1.5;
+              var sewingCost = sewingFeet * v.sewingRate;
+              var fittingCost = v.fittingCost;
+              return [
+                { label: "હેવી ડ્યુટી ચેનલ ખર્ચ", value: channelCost },
+                { label: "રનર/કલેમ્પ ખર્ચ", value: runnerCost },
+                { label: "સ્પેશિયલ બેલ્ટ મજૂરી", value: beltCost },
+                {
+                  label: "કાપડ ખર્ચ (" + meter.toFixed(2) + " મીટર)",
+                  value: fabricCost,
+                },
+                { label: "પ્રીમિયમ સિલાઈ મજૂરી", value: sewingCost },
+                { label: "ઇન્સ્ટોલેશન મજૂરી", value: fittingCost },
+              ];
+            },
+          },
+        };
+
+        var currentType = null;
+        var els = {};
+        [
+          "screen-select",
+          "screen-form",
+          "screen-list",
+          "formTitle",
+          "dynamicFields",
+          "height",
+          "width",
+          "fullness",
+          "commission",
+          "gst",
+          "discount",
+          "breakdownList",
+          "subtotalVal",
+          "commissionVal",
+          "gstVal",
+          "discountVal",
+          "grandTotalVal",
+          "custName",
+          "custPhone",
+          "custDate",
+          "quotationsList",
+          "printArea",
+        ].forEach(function (id) {
+          els[id] = document.getElementById(id);
+        });
+
+        function fmt(n) {
+          if (isNaN(n)) n = 0;
+          return "₹" + Math.round(n).toLocaleString("en-IN");
+        }
+        function num(id) {
+          return parseFloat(document.getElementById(id).value) || 0;
+        }
+
+        function showScreen(id) {
+          document.querySelectorAll(".screen").forEach(function (s) {
+            s.classList.remove("active");
+          });
+          document.getElementById(id).classList.add("active");
+        }
+
+        function selectType(typeKey) {
+          currentType = typeKey;
+          var cfg = CONFIG[typeKey];
+          els.formTitle.textContent = cfg.name;
+          els.fullness.value = cfg.fullness;
+          els.height.value = els.height.value || 0;
+          els.width.value = els.width.value || 0;
+
+          var html = "";
+          cfg.fields.forEach(function (f) {
+            html +=
+              "<label>" +
+              f.label +
+              '<input id="f_' +
+              f.key +
+              '" type="number" min="0" step="0.5" value="' +
+              f.def +
+              '"></label>';
+          });
+          els.dynamicFields.innerHTML = html;
+
+          cfg.fields.forEach(function (f) {
+            document
+              .getElementById("f_" + f.key)
+              .addEventListener("input", calculate);
+          });
+
+          showScreen("screen-form");
+          calculate();
+        }
+
+        function gatherValues() {
+          var cfg = CONFIG[currentType];
+          var v = {
+            height: num("height"),
+            width: num("width"),
+            fullness: num("fullness"),
+          };
+          cfg.fields.forEach(function (f) {
+            v[f.key] = num("f_" + f.key);
+          });
+          return v;
+        }
+
+        function calculate() {
+          if (!currentType) return;
+          var v = gatherValues();
+          var items = CONFIG[currentType].calc(v);
+
+          var subtotal = items.reduce(function (s, i) {
+            return s + i.value;
+          }, 0);
+          var commissionPct = num("commission");
+          var gstPct = num("gst");
+          var discount = num("discount");
+
+          var commissionAmt = (subtotal * commissionPct) / 100;
+          var afterCommission = subtotal + commissionAmt;
+          var gstAmt = (afterCommission * gstPct) / 100;
+          var afterGst = afterCommission + gstAmt;
+          var grandTotal = afterGst - discount;
+
+          els.breakdownList.innerHTML = items
+            .map(function (i) {
+              return (
+                '<div class="breakdown-row"><span>' +
+                i.label +
+                "</span><span>" +
+                fmt(i.value) +
+                "</span></div>"
+              );
+            })
+            .join("");
+
+          els.subtotalVal.textContent = fmt(subtotal);
+          els.commissionVal.textContent = fmt(commissionAmt);
+          els.gstVal.textContent = fmt(gstAmt);
+          els.discountVal.textContent = fmt(discount);
+          els.grandTotalVal.textContent = fmt(grandTotal);
+
+          return {
+            items: items,
+            subtotal: subtotal,
+            commissionAmt: commissionAmt,
+            gstAmt: gstAmt,
+            discount: discount,
+            grandTotal: grandTotal,
+          };
+        }
+
+        [
+          "height",
+          "width",
+          "fullness",
+          "commission",
+          "gst",
+          "discount",
+        ].forEach(function (id) {
+          document.getElementById(id).addEventListener("input", calculate);
+        });
+
+        document.querySelectorAll(".type-card").forEach(function (card) {
+          card.addEventListener("click", function () {
+            selectType(card.getAttribute("data-type"));
+          });
+        });
+
+        document
+          .getElementById("backBtn")
+          .addEventListener("click", function () {
+            showScreen("screen-select");
+          });
+        document
+          .getElementById("backBtn2")
+          .addEventListener("click", function () {
+            showScreen("screen-select");
+          });
+
+        document
+          .getElementById("viewAllBtn")
+          .addEventListener("click", function () {
+            renderQuotationsList();
+            showScreen("screen-list");
+          });
+
+        function loadQuotations() {
+          try {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+          } catch (e) {
+            return [];
+          }
+        }
+        function saveQuotations(list) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+        }
+
+        document
+          .getElementById("saveBtn")
+          .addEventListener("click", function () {
+            if (!currentType) return;
+            var totals = calculate();
+            var record = {
+              id: Date.now(),
+              type: currentType,
+              typeName: CONFIG[currentType].name,
+              customer: {
+                name: els.custName.value,
+                phone: els.custPhone.value,
+                date: els.custDate.value,
+              },
+              measurements: {
+                height: num("height"),
+                width: num("width"),
+                fullness: num("fullness"),
+              },
+              items: totals.items,
+              subtotal: totals.subtotal,
+              commissionAmt: totals.commissionAmt,
+              gstAmt: totals.gstAmt,
+              discount: totals.discount,
+              grandTotal: totals.grandTotal,
+            };
+            var list = loadQuotations();
+            list.unshift(record);
+            saveQuotations(list);
+            alert("કોટેશન સેવ થયું ✅");
+          });
+
+        function renderQuotationsList() {
+          var list = loadQuotations();
+          if (list.length === 0) {
+            els.quotationsList.innerHTML =
+              '<p class="empty-note">હજુ સુધી કોઈ કોટેશન સેવ થયું નથી.</p>';
+            return;
+          }
+          els.quotationsList.innerHTML = list
+            .map(function (q) {
+              var dateStr = q.customer.date || "";
+              return (
+                '<div class="quotation-item">' +
+                '<div class="quotation-info">' +
+                "<b>" +
+                (q.customer.name || "નામ વગર") +
+                "</b>" +
+                '<div class="meta">' +
+                q.typeName +
+                " · " +
+                dateStr +
+                "</div>" +
+                "</div>" +
+                '<div class="quotation-total">' +
+                fmt(q.grandTotal) +
+                "</div>" +
+                '<div class="qi-actions">' +
+                '<button onclick="window.__printSaved(' +
+                q.id +
+                ')">પ્રિન્ટ</button>' +
+                '<button class="danger" onclick="window.__deleteSaved(' +
+                q.id +
+                ')">ડિલીટ</button>' +
+                "</div>" +
+                "</div>"
+              );
+            })
+            .join("");
+        }
+
+        window.__deleteSaved = function (id) {
+          if (!confirm("આ કોટેશન ડિલીટ કરવું છે?")) return;
+          var list = loadQuotations().filter(function (q) {
+            return q.id !== id;
+          });
+          saveQuotations(list);
+          renderQuotationsList();
+        };
+
+        function buildPrintHTML(data) {
+          var rows = data.items
+            .map(function (i) {
+              return (
+                "<tr><td>" +
+                i.label +
+                '</td><td style="text-align:right">' +
+                fmt(i.value) +
+                "</td></tr>"
+              );
+            })
+            .join("");
+          return (
+            '<div class="print-doc">' +
+            "<h2>પડદા કોટેશન</h2>" +
+            '<div class="pd-sub">' +
+            data.typeName +
+            "</div>" +
+            "<table>" +
+            '<tr><td><b>ગ્રાહકનું નામ</b></td><td style="text-align:right">' +
+            (data.customer.name || "-") +
+            "</td></tr>" +
+            '<tr><td><b>ફોન નંબર</b></td><td style="text-align:right">' +
+            (data.customer.phone || "-") +
+            "</td></tr>" +
+            '<tr><td><b>તારીખ</b></td><td style="text-align:right">' +
+            (data.customer.date || "-") +
+            "</td></tr>" +
+            '<tr><td><b>ઊંચાઈ × પહોળાઈ</b></td><td style="text-align:right">' +
+            data.measurements.height +
+            '" × ' +
+            data.measurements.width +
+            '"</td></tr>' +
+            "</table>" +
+            "<table>" +
+            rows +
+            "</table>" +
+            "<table>" +
+            '<tr><td>Subtotal</td><td style="text-align:right">' +
+            fmt(data.subtotal) +
+            "</td></tr>" +
+            '<tr><td>+ કમિશન</td><td style="text-align:right">' +
+            fmt(data.commissionAmt) +
+            "</td></tr>" +
+            '<tr><td>+ GST</td><td style="text-align:right">' +
+            fmt(data.gstAmt) +
+            "</td></tr>" +
+            '<tr><td>− ડિસ્કાઉન્ટ</td><td style="text-align:right">' +
+            fmt(data.discount) +
+            "</td></tr>" +
+            '<tr class="pd-grand"><td>કુલ રકમ</td><td style="text-align:right">' +
+            fmt(data.grandTotal) +
+            "</td></tr>" +
+            "</table>" +
+            "</div>"
+          );
+        }
+
+        document
+          .getElementById("printBtn")
+          .addEventListener("click", function () {
+            if (!currentType) return;
+            var totals = calculate();
+            var data = {
+              typeName: CONFIG[currentType].name,
+              customer: {
+                name: els.custName.value,
+                phone: els.custPhone.value,
+                date: els.custDate.value,
+              },
+              measurements: { height: num("height"), width: num("width") },
+              items: totals.items,
+              subtotal: totals.subtotal,
+              commissionAmt: totals.commissionAmt,
+              gstAmt: totals.gstAmt,
+              discount: totals.discount,
+              grandTotal: totals.grandTotal,
+            };
+            els.printArea.innerHTML = buildPrintHTML(data);
+            window.print();
+          });
+
+        window.__printSaved = function (id) {
+          var q = loadQuotations().filter(function (x) {
+            return x.id === id;
+          })[0];
+          if (!q) return;
+          els.printArea.innerHTML = buildPrintHTML(q);
+          window.print();
+        };
+      })();
+    </script>
+  </body>
+</html>
